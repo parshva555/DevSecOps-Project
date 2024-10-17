@@ -1,23 +1,23 @@
 resource "aws_instance" "web" {
   ami           = "ami-005fc0f236362e99f"
-  instance_type = "t2.large"
+  instance_type = "t2.medium"
   key_name = "my-private-key-pd"
-  vpc_security_group_ids = [aws_security_group.netflix-jenkins-sg.id]
+  vpc_security_group_ids = [aws_security_group.monitoring-sg.id]
   user_data = templatefile("./install.sh",{})
 
   tags = {
-    Name = "netflix-jenkins"
+    Name = "Monitoring"
   }
   root_block_device{
-    volume_size = 25
+    volume_size = 20
     }
 }
-resource "aws_security_group" "netflix-jenkins-sg" {
-  name        = "netflix-jenkins-sg"
+resource "aws_security_group" "monitoring-sg" {
+  name        = "monitoring-sg"
   description = "Allow TLS inbound traffic"
 
   ingress = [
-    for port in [22,80,443,8080,9000,8081] :
+    for port in [22,443,8080,3000,9090,9100] :
         {
           description = "inbound rules"
           from_port = port
@@ -39,6 +39,6 @@ resource "aws_security_group" "netflix-jenkins-sg" {
   }
 
   tags = {
-    Name = "netflix-jenkins-sg"
+    Name = "monitoring-sg"
   }
 }
